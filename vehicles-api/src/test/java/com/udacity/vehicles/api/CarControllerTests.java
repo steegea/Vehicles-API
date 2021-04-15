@@ -30,6 +30,7 @@ import java.util.Collections;
 
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
@@ -189,17 +190,22 @@ public class CarControllerTests {
 
         carDetails.setManufacturer(manufacturer);
         carDetails.setModel("Focus");
+        car.setCondition(Condition.NEW);
 
         String carManufacturerName = carDetails.getManufacturer().getName();
         int carManufacturerCode = manufacturer.getCode();
 
         String carModel = carDetails.getModel();
 
+        Condition carCondition = car.getCondition();
+        String carConditionString = carCondition.toString().replaceAll("<>", "");
+
         //Assertion statements
         assertEquals(carManufacturerCode, 102);
         assertEquals(carManufacturerName, "Ford");
         assertEquals(carModel, "Focus");
         assertEquals(carID, 1);
+        assertEquals(carCondition, Condition.NEW);
 
         //Method invocation
         addOrUpdateCar();
@@ -213,7 +219,8 @@ public class CarControllerTests {
                 .andExpect(statusCodeOK)
 
                 .andExpect(jsonPath("details.manufacturer.name", is(carManufacturerName)))
-                .andExpect(jsonPath("details.model", is(carModel)));
+                .andExpect(jsonPath("details.model", is(carModel)))
+                .andExpect(jsonPath("condition", containsString(carConditionString)));
 
         verify(carService).save(any(Car.class));
 
